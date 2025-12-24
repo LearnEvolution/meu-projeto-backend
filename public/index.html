@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Projeto Finalizado 🚀</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px 0;
+    }
+    button {
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+      background: #222;
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Lista de Itens</h1>
+
+  <input id="itemInput" placeholder="Digite um item" />
+  <button onclick="addItem()">Adicionar</button>
+
+  <ul id="itemList"></ul>
+
+  <script>
+    
+    const API = "/items";
+
+    async function loadItems() {
+      const res = await fetch(API);
+      const items = await res.json();
+      const list = document.getElementById("itemList");
+      list.innerHTML = "";
+
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${item.name}
+          <button onclick="deleteItem(${item.id})">X</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function addItem() {
+      const input = document.getElementById("itemInput");
+      if (!input.value) return;
+
+      await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: input.value })
+      });
+
+      input.value = "";
+      loadItems();
+    }
+
+    async function deleteItem(id) {
+      await fetch(`${API}/${id}`, { method: "DELETE" });
+      loadItems();
+    }
+
+    loadItems();
+  </script>
+
+</body>
+</html>
